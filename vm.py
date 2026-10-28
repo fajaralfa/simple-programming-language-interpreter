@@ -99,10 +99,23 @@ class VM:
                     raise ZeroDivisionError("division by zero")
                 return self.eval(expr.left, scope) / b
 
-            case BinaryExpr() if expr.op in {OP.EQUAL, OP.NOT_EQUAL, OP.LT, OP.GT, OP.LE, OP.GE}:
-                a, b = self.eval(expr.left, scope), self.eval(expr.right, scope)
-                return {"==": a == b, "!=": a != b, "<": a < b,
-                        ">": a > b, "<=": a <= b, ">=": a >= b}[expr.op]
+            case BinaryExpr(op, left, right) if expr.op in {OP.EQUAL, OP.NOT_EQUAL, OP.LT, OP.GT, OP.LE, OP.GE}:
+                a, b = self.eval(left, scope), self.eval(right, scope)
+                result = None
+                match op:
+                    case OP.EQUAL:
+                        result = a == b
+                    case OP.NOT_EQUAL:
+                        result = a != b
+                    case OP.LT:
+                        result = a < b
+                    case OP.GT:
+                        result = a > b
+                    case OP.LE:
+                        result = a <= b
+                    case OP.GE:
+                        result = a >= b
+                return result
 
             case BinaryExpr(OP.AND, left, right):
                 return self.eval(expr.left, scope) and self.eval(expr.right, scope)
